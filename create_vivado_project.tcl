@@ -12,15 +12,19 @@ file mkdir $project_dir
 # Create new project
 create_project $project_name $project_dir -part xc7a35tcpg236-1 -force
 
-# Add source files
-add_files -norecurse ./src/riscv_processor.v
+# Add source files - Complete version with all instruction types
+add_files -norecurse ./src/riscv_processor_complete.v
 
 # Add testbench files
-add_files -fileset sim_1 -norecurse ./src/riscv_processor_tb.v
+add_files -fileset sim_1 -norecurse ./src/riscv_processor_complete_tb.v
 
-# Set top module
-set_property top riscv_processor [current_fileset]
-set_property top riscv_processor_tb [get_filesets sim_1]
+# Also add basic version for comparison
+add_files -norecurse ./src/riscv_processor_fixed.v
+add_files -fileset sim_1 -norecurse ./src/riscv_processor_tb_fixed.v
+
+# Set top module to complete version
+set_property top riscv_processor_complete [current_fileset]
+set_property top riscv_processor_complete_tb [get_filesets sim_1]
 
 # Update compile order
 update_compile_order -fileset sources_1
