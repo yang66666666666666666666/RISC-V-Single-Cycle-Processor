@@ -11,14 +11,26 @@ TB_BASIC = src/riscv_processor_tb_fixed.v
 SRC_COMPLETE = src/riscv_processor_complete.v
 TB_COMPLETE = src/riscv_processor_complete_tb.v
 
+SRC_DEBUG = src/riscv_processor_debug.v
+TB_DEBUG = src/riscv_processor_debug_tb.v
+
 # Output files
 VVP_BASIC = riscv_processor_basic.vvp
 VVP_COMPLETE = riscv_processor_complete.vvp
+VVP_DEBUG = riscv_processor_debug.vvp
 VCD_BASIC = riscv_processor_basic.vcd
 VCD_COMPLETE = riscv_processor_complete.vcd
+VCD_DEBUG = riscv_processor_debug.vcd
 
-# Default target - run complete version
-all: complete
+# Default target - run debug version (recommended for troubleshooting)
+all: debug
+
+# Debug version with simplified test program (recommended)
+debug: $(VVP_DEBUG)
+	vvp $(VVP_DEBUG)
+
+$(VVP_DEBUG): $(SRC_DEBUG) $(TB_DEBUG) $(SRC_COMPLETE)
+	iverilog -o $(VVP_DEBUG) $(SRC_COMPLETE) $(SRC_DEBUG) $(TB_DEBUG)
 
 # Complete version with all instruction types
 complete: $(VVP_COMPLETE)
@@ -57,7 +69,7 @@ verilator:
 
 # Clean generated files
 clean:
-	rm -f $(VVP_BASIC) $(VCD_BASIC) $(VVP_COMPLETE) $(VCD_COMPLETE)
+	rm -f $(VVP_BASIC) $(VCD_BASIC) $(VVP_COMPLETE) $(VCD_COMPLETE) $(VVP_DEBUG) $(VCD_DEBUG)
 	rm -rf work/
 	rm -rf obj_dir/
 	rm -f transcript
@@ -66,7 +78,8 @@ clean:
 # Help target
 help:
 	@echo "Available targets:"
-	@echo "  all        - Default target (complete version)"
+	@echo "  all        - Default target (debug version - recommended)"
+	@echo "  debug      - Run debug RISC-V processor (simplified, no infinite loops)"
 	@echo "  complete   - Run complete RISC-V processor (R,I,U,S,B,J types)"
 	@echo "  basic      - Run basic RISC-V processor (original version)"
 	@echo "  iverilog   - Alias for basic (backward compatibility)"
@@ -77,11 +90,16 @@ help:
 	@echo "  help       - Show this help message"
 	@echo ""
 	@echo "Instruction type support:"
-	@echo "  Complete version: R, I, U, S, B, J types"
+	@echo "  Debug version: R, I, U, S, B, J types (simplified test program)"
+	@echo "  Complete version: R, I, U, S, B, J types (full test program)"
 	@echo "  Basic version: R, I, S types (limited)"
+	@echo ""
+	@echo "Troubleshooting:"
+	@echo "  If you see infinite loops or 'xx' values, try 'make debug'"
+	@echo "  Debug version has simplified test program without problematic jumps"
 	@echo ""
 	@echo "For Windows users:"
 	@echo "  Use run_vivado.bat to create Vivado project"
 	@echo "  Or install WSL/MSYS2 to use this Makefile"
 
-.PHONY: all complete basic iverilog modelsim modelsim-basic verilator clean help simulate
+.PHONY: all debug complete basic iverilog modelsim modelsim-basic verilator clean help simulate

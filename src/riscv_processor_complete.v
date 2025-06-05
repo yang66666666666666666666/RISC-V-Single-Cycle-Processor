@@ -42,7 +42,10 @@ module riscv_processor_complete(
 
     // PC Adders
     assign pc_plus4 = pc_out + 4;
-    assign pc_target = pc_out + imm_ext;
+    
+    // PC Target calculation - different for JAL vs JALR
+    wire jalr_instruction = (instruction[6:0] == 7'b1100111); // JALR opcode
+    assign pc_target = jalr_instruction ? (src_a + imm_ext) : (pc_out + imm_ext);
 
     // PC Source Multiplexer - supports both branch and jump
     assign pc_next = (pc_src | jump) ? pc_target : pc_plus4;
@@ -196,12 +199,12 @@ module instruction_memory_complete(
         memory[23] = 32'h00000013;  // nop
         memory[24] = 32'h00000013;  // nop
         memory[25] = 32'h00000013;  // nop
-        memory[26] = 32'h00108067;  // jalr x0, x1, 1       (jump and link register)
+        memory[26] = 32'h00300793;  // addi x15, x0, 3      (x15 = 3) - 跳转目标
+        memory[27] = 32'h00400813;  // addi x16, x0, 4      (x16 = 4)
+        memory[28] = 32'h00108067;  // jalr x0, x1, 1       (return to x1+1)
         
-        // More test instructions
-        memory[27] = 32'h00300793;  // addi x15, x0, 3      (x15 = 3)
-        memory[28] = 32'h00000013;  // nop
-        memory[29] = 32'h00000013;  // nop
+        // More test instructions  
+        memory[29] = 32'h00500893;  // addi x17, x0, 5      (x17 = 5)
         memory[30] = 32'h00000013;  // nop
         
         // Initialize remaining memory to NOPs
