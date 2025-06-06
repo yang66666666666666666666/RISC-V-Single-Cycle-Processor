@@ -193,12 +193,12 @@ module riscv_processor_complete_tb;
         end
         
         $display("\n=== Instruction Type Summary ===");
-        $display("✓ I-type: addi, slli, slti, lw");
-        $display("✓ R-type: add, sub, and, or, xor, sll, slt");
-        $display("✓ U-type: lui, auipc");
-        $display("✓ S-type: sw");
-        $display("✓ B-type: beq, bne, blt, bge");
-        $display("✓ J-type: jal, jalr");
+        $display("+ I-type: addi, slli, slti, lw");
+        $display("+ R-type: add, sub, and, or, xor, sll, slt");
+        $display("+ U-type: lui, auipc");
+        $display("+ S-type: sw");
+        $display("+ B-type: beq, bne, blt, bge");
+        $display("+ J-type: jal, jalr");
         
         $display("\n=== Expected Register Values ===");
         $display("x1  = 5 (0x00000005)");
